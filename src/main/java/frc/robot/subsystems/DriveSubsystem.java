@@ -57,7 +57,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void arcadeDrive(double fwd, double rot) {
-    differentialDrive.arcadeDrive(fwd, rot * 0.5);
+    differentialDrive.arcadeDrive(fwd * 0.7, rot * 0.7);
   }
 
   public void stopMotors() {
