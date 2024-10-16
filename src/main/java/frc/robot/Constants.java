@@ -20,9 +20,9 @@ public final class Constants {
   public final class DriveConstants {
     public static final boolean USING_DRIVE = true;
     //Update All Channels If Needed
-    public static final int leftFrontChannel = 0; // One-Red-Bumper-Bot (ORBB): 3 | All-Red: 0
-    public static final int leftBackChannel = 2; // ORBB: 2 | AR: 2
-    public static final int rightFrontChannel = 1; // ORBB: 0 | AR: 1
-    public static final int rightBackChannel = 3; // ORBB: 1 | AR: 3
+    public static final int leftFrontChannel = 2; 
+    public static final int leftBackChannel = 1; 
+    public static final int rightFrontChannel = 4; 
+    public static final int rightBackChannel = 3; 
   }
 }
