@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -23,18 +28,29 @@ public final class Constants {
 
   public final class DriveConstants {
     public static final boolean USING_DRIVE = true;
-<<<<<<< HEAD
+
     //Update All Channels If Needed
-    public static final int leftFrontChannel = 2; 
-    public static final int leftBackChannel = 1; 
-    public static final int rightFrontChannel = 4; 
-    public static final int rightBackChannel = 3; 
-=======
+    //public static final int leftFrontChannel = 2; 
+    //public static final int leftBackChannel = 1; 
+    //public static final int rightFrontChannel = 4; 
+    //public static final int rightBackChannel = 3; 
+
     // Update All Channels If Needed
     public static final int leftFrontChannel = 2; // One-Red-Bumper-Bot (ORBB): 3 | All-Red: 0
     public static final int leftBackChannel = 1; // ORBB: 2 | AR: 2
     public static final int rightFrontChannel = 4; // ORBB: 0 | AR: 1
     public static final int rightBackChannel = 3; // ORBB: 1 | AR: 3
->>>>>>> 22f930b410daa4438b7f21454961197f92925176
+
+
+    public static final DifferentialDriveKinematics kinematics =
+        new DifferentialDriveKinematics(Units.inchesToMeters(1.0)); //UPDATE TRACK WIDTH
+    public static final ChassisSpeeds chassisSpeeds = 
+        new ChassisSpeeds(2.0, 0, 1.0); //UPDATE VELOCITIES
+    public static final DifferentialDriveWheelSpeeds wheelSpeeds =
+        kinematics.toWheelSpeeds(chassisSpeeds); //UPDTE WHEEL SPEEDS
+    double leftVelocity = wheelSpeeds.leftMetersPerSecond;
+    double rightVelocity = wheelSpeeds.rightMetersPerSecond;
+    double linearVelocity = chassisSpeeds.vxMetersPerSecond; //Linear Velocity
+    double angularVelocity = chassisSpeeds.omegaRadiansPerSecond; //Angular Velocity    
   }
 }
