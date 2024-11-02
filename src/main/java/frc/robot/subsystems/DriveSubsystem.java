@@ -8,11 +8,22 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.controllers.PPLTVController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.util.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -54,7 +65,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     gyro = new AHRS(SPI.Port.kMXP); 
     odometer = new DifferentialDriveOdometry(gyro.getRotation2d(), lfEncoder.getPosition(), rfEncoder.getPosition(), 
-                                             new Pose2d(5.0, 13.5, new Rotation2d())); //ADD POSE2D
+                                             new Pose2d(5.0, 13.5, new Rotation2d())); //MODIFY
     
     lfEncoder.setPositionConversionFactor(1); // TODO: Find relative to wheels instead of motors
     lbEncoder.setPositionConversionFactor(1);
@@ -69,6 +80,27 @@ public class DriveSubsystem extends SubsystemBase {
     differentialDrive = new DifferentialDrive(leftFrontMotor, rightFrontMotor);
 
     this.xboxController = xboxController;
+
+
+    ReplanningConfig config = new ReplanningConfig(true, true, 0.1, 0.1); //TODO: UPDATE
+
+    AutoBuilder.configureRamsete(
+            this::getPose, 
+            this::resetPose, 
+            this::getRobotRelativeSpeeds, 
+            this::setChassisSpeeds,        
+            // (ChassisSpeeds) -> odometer, 
+            // new PPLTVController(0.02), 
+            config, 
+            () -> {
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this 
+    );
   }
 
   public void arcadeDrive(double fwd, double rot) {
@@ -84,6 +116,14 @@ public class DriveSubsystem extends SubsystemBase {
     lbEncoder.setPosition(0);
     rfEncoder.setPosition(0);
     rbEncoder.setPosition(0);
+  }
+
+  public Pose2d getPose() {
+    return odometer.getPoseMeters();
+  }
+
+  public void resetPose(Pose2d pose) {
+    odometer.resetPosition(gyro.getRotation2d(), wheelPositions, pose);
   }
 
   public RelativeEncoder getLFncoder() {
@@ -108,6 +148,18 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void resetPosition(Pose2d newPose){
     odometer.resetPosition(gyro.getRotation2d(), wheelPositions, newPose);
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return DriveConstants.kinematics.toChassisSpeeds(getDifferentialDriveWheelSpeeds());
+  }
+
+  public DifferentialDriveWheelSpeeds getDifferentialDriveWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(lbEncoder.getVelocity(), rbEncoder.getVelocity());
+  }
+
+  public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+    // TODO
   }
 
   @Override

@@ -26,6 +26,15 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+  public static class AutoConstants {
+    // RobotConfig config;
+    // try{
+    //   config = RobotConfig.fromGUISettings();
+    // } catch (Exception e) {
+    //   e.printStackTrace();
+    // }
+  }
+
   public final class DriveConstants {
     public static final boolean USING_DRIVE = true;
 
@@ -51,6 +60,6 @@ public final class Constants {
     double leftVelocity = wheelSpeeds.leftMetersPerSecond;
     double rightVelocity = wheelSpeeds.rightMetersPerSecond;
     double linearVelocity = chassisSpeeds.vxMetersPerSecond; //Linear Velocity
-    double angularVelocity = chassisSpeeds.omegaRadiansPerSecond; //Angular Velocity    
+    double angularVelocity = chassisSpeeds.omegaRadiansPerSecond; //Angular Velocity  
   }
 }

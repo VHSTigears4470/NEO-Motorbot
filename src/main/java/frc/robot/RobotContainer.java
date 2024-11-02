@@ -17,7 +17,6 @@ public class RobotContainer {
 
   private CommandXboxController xbox;
   private DriveSubsystem driveSubsystem;
-
   public RobotContainer() {
     this.xbox = new CommandXboxController(OperatorConstants.kDriverControllerPort);
     this.driveSubsystem = new DriveSubsystem(xbox);
