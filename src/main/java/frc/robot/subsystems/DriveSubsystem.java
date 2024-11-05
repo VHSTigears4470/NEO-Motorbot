@@ -63,10 +63,10 @@ public class DriveSubsystem extends SubsystemBase {
     odometer = new DifferentialDriveOdometry(gyro.getRotation2d(), lfEncoder.getPosition(), rfEncoder.getPosition(), 
                                              new Pose2d(0, 0, new Rotation2d())); //MODIFY (5, 13.5)
     
-    lfEncoder.setPositionConversionFactor(1); // TODO: Find relative to wheels instead of motors
-    lbEncoder.setPositionConversionFactor(1);
-    rfEncoder.setPositionConversionFactor(1);
-    rbEncoder.setPositionConversionFactor(1);
+    lfEncoder.setPositionConversionFactor(50); // TODO: Find relative to wheels instead of motors
+    lbEncoder.setPositionConversionFactor(50);
+    rfEncoder.setPositionConversionFactor(50);
+    rbEncoder.setPositionConversionFactor(50);
 
     leftBackMotor.follow(leftFrontMotor);
     leftFrontMotor.setInverted(false);
@@ -161,9 +161,10 @@ public class DriveSubsystem extends SubsystemBase {
   public Command getAutonomousCommand(String pathName, boolean setOdomToStart) {
     // Load the path you want to follow using its name in the GUI
     try {
-      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+      System.out.println("Trying");
+      PathPlannerPath path = PathPlannerPath.fromPathFile("NEO Test 1");
 
-      if (setOdomToStart) {
+      if (true) {
         resetPose(path.getPreviewStartingHolonomicPose());
       }
 
@@ -172,6 +173,7 @@ public class DriveSubsystem extends SubsystemBase {
       return AutoBuilder.followPath(path);
 
     } catch (RuntimeException e) {
+      System.out.println(e);
       return null;
     }
   }

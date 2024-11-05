@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,12 +26,13 @@ public class RobotContainer {
   private DriveSubsystem driveSubsystem;
 
   public RobotContainer() {
+    this.xbox = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+    this.driveSubsystem = new DriveSubsystem(xbox);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    this.xbox = new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    this.driveSubsystem = new DriveSubsystem(xbox);
-    autoChooser.addOption("NEO Test 1", driveSubsystem.getAutonomousCommand("NEO Test 1", true));
+    
+    autoChooser.addOption("NEO Test 1", new PathPlannerAuto("NEO Test 1"));
     // Configure the trigger bindings
     //configureBindings();
     initializeDriveMode(xbox);
