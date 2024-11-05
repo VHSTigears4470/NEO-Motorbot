@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
@@ -154,6 +156,24 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
     arcadeDrive(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  public Command getAutonomousCommand(String pathName, boolean setOdomToStart) {
+    // Load the path you want to follow using its name in the GUI
+    try {
+      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+
+      if (setOdomToStart) {
+        resetPose(path.getPreviewStartingHolonomicPose());
+      }
+
+      // Create a path following command using AutoBuilder. This will also trigger
+      // event markers.
+      return AutoBuilder.followPath(path);
+
+    } catch (RuntimeException e) {
+      return null;
+    }
   }
 
   @Override
