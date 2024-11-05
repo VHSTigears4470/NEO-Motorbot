@@ -4,16 +4,12 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.controllers.PPLTVController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.ReplanningConfig;
-import com.pathplanner.lib.util.*;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,13 +17,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -65,7 +59,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     gyro = new AHRS(SPI.Port.kMXP); 
     odometer = new DifferentialDriveOdometry(gyro.getRotation2d(), lfEncoder.getPosition(), rfEncoder.getPosition(), 
-                                             new Pose2d(5.0, 13.5, new Rotation2d())); //MODIFY
+                                             new Pose2d(0, 0, new Rotation2d())); //MODIFY (5, 13.5)
     
     lfEncoder.setPositionConversionFactor(1); // TODO: Find relative to wheels instead of motors
     lbEncoder.setPositionConversionFactor(1);
@@ -159,7 +153,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    // TODO
+    arcadeDrive(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
   }
 
   @Override

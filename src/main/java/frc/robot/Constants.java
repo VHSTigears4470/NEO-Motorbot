@@ -53,7 +53,7 @@ public final class Constants {
 
     public static final DifferentialDriveKinematics kinematics =
         new DifferentialDriveKinematics(Units.inchesToMeters(1.0)); //UPDATE TRACK WIDTH
-    public static final ChassisSpeeds chassisSpeeds = 
+    public static ChassisSpeeds chassisSpeeds = 
         new ChassisSpeeds(2.0, 0, 1.0); //UPDATE VELOCITIES
     public static final DifferentialDriveWheelSpeeds wheelSpeeds =
         kinematics.toWheelSpeeds(chassisSpeeds); //UPDTE WHEEL SPEEDS
