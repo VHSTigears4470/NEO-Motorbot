@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -63,10 +64,10 @@ public class DriveSubsystem extends SubsystemBase {
     odometer = new DifferentialDriveOdometry(gyro.getRotation2d(), lfEncoder.getPosition(), rfEncoder.getPosition(), 
                                              new Pose2d(0, 0, new Rotation2d())); //MODIFY (5, 13.5)
     
-    lfEncoder.setPositionConversionFactor(50); // TODO: Find relative to wheels instead of motors
-    lbEncoder.setPositionConversionFactor(50);
-    rfEncoder.setPositionConversionFactor(50);
-    rbEncoder.setPositionConversionFactor(50);
+    lfEncoder.setPositionConversionFactor(DriveConstants.gearRatio); 
+    lbEncoder.setPositionConversionFactor(DriveConstants.gearRatio); 
+    rfEncoder.setPositionConversionFactor(DriveConstants.gearRatio);
+    rbEncoder.setPositionConversionFactor(DriveConstants.gearRatio);
 
     leftBackMotor.follow(leftFrontMotor);
     leftFrontMotor.setInverted(false);
@@ -126,6 +127,10 @@ public class DriveSubsystem extends SubsystemBase {
     return lfEncoder;
   }
 
+  public double getPosition(RelativeEncoder encoder){
+    return encoder.getPosition();
+  }
+
   public RelativeEncoder getLBncoder() {
     return lbEncoder;
   }
@@ -180,7 +185,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    var gyroAngle = gyro.getRotation2d();
+    SmartDashboard.putNumber("# of Rotations", getPosition(lfEncoder));
+    var gyroAngle = gyro.getRotation2d();                                       
     // This method will be called once per scheduler run
     Pose2d pose = odometer.update(gyroAngle, lfEncoder.getPosition(), rfEncoder.getPosition()); //Updating pose
   }
