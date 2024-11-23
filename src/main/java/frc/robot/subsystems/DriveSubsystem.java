@@ -64,10 +64,10 @@ public class DriveSubsystem extends SubsystemBase {
     odometer = new DifferentialDriveOdometry(gyro.getRotation2d(), lfEncoder.getPosition(), rfEncoder.getPosition(), 
                                              new Pose2d(0, 0, new Rotation2d())); //MODIFY (5, 13.5)
     
-    lfEncoder.setPositionConversionFactor(DriveConstants.gearRatio); 
-    lbEncoder.setPositionConversionFactor(DriveConstants.gearRatio); 
-    rfEncoder.setPositionConversionFactor(DriveConstants.gearRatio);
-    rbEncoder.setPositionConversionFactor(DriveConstants.gearRatio);
+    lfEncoder.setPositionConversionFactor(DriveConstants.wheelRate); 
+    lbEncoder.setPositionConversionFactor(DriveConstants.wheelRate); 
+    rfEncoder.setPositionConversionFactor(DriveConstants.wheelRate);
+    rbEncoder.setPositionConversionFactor(DriveConstants.wheelRate);
 
     leftBackMotor.follow(leftFrontMotor);
     leftFrontMotor.setInverted(false);

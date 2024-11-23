@@ -50,7 +50,7 @@ public final class Constants {
     public static final int rightFrontChannel = 4; // ORBB: 0 | AR: 1
     public static final int rightBackChannel = 3; // ORBB: 1 | AR: 3
 
-    public static final double gearRatio = 1/ 10.71; //1/10.71, 1/8.45, 1/5.95
+    public static final double wheelRate = 6 * Math.PI / 10.71; //1/10.71, 1/8.45, 1/5.95
 
 
     public static final DifferentialDriveKinematics kinematics =
