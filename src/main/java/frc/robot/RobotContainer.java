@@ -87,7 +87,11 @@ public class RobotContainer {
    
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
+    return driveSubsystem.getAutonomousCommand("NEO Test 1", true);
+  }
+
+  public void reset(){
+    driveSubsystem.resetEncoders();
   }
   
 }

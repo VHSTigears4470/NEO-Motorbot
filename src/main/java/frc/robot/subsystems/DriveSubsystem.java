@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import java.nio.file.Path;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -160,24 +163,21 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    arcadeDrive(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+    arcadeDrive(Math.signum(chassisSpeeds.vxMetersPerSecond) * -1 * Math.min(Math.abs(chassisSpeeds.vxMetersPerSecond), 0.7), Math.signum(chassisSpeeds.omegaRadiansPerSecond) * Math.min(Math.abs(chassisSpeeds.omegaRadiansPerSecond), 0.7));
   }
 
   public Command getAutonomousCommand(String pathName, boolean setOdomToStart) {
     // Load the path you want to follow using its name in the GUI
     try {
       System.out.println("Trying");
-      PathPlannerPath path = PathPlannerPath.fromPathFile("NEO Test 1");
-
-      if (true) {
-        resetPose(path.getPreviewStartingHolonomicPose());
-      }
+      PathPlannerAuto path = new PathPlannerAuto("NEO Test 1");
+      resetPose(PathPlannerAuto.getStaringPoseFromAutoFile("NEO Test 1"));
 
       // Create a path following command using AutoBuilder. This will also trigger
       // event markers.
-      return AutoBuilder.followPath(path);
+      return path;
 
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
       System.out.println(e);
       return null;
     }
