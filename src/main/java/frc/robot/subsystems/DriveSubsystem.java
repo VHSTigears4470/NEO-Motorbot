@@ -84,6 +84,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     ReplanningConfig config = new ReplanningConfig(true, true, 0.1, 0.1); //TODO: UPDATE
 
+    
+
     AutoBuilder.configureRamsete(
             this::getPose, 
             this::resetPose, 
@@ -163,7 +165,17 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    arcadeDrive(Math.signum(chassisSpeeds.vxMetersPerSecond) * -1 * Math.min(Math.abs(chassisSpeeds.vxMetersPerSecond), 0.7), Math.signum(chassisSpeeds.omegaRadiansPerSecond) * Math.min(Math.abs(chassisSpeeds.omegaRadiansPerSecond), 0.7));
+    arcadeDrive(Math.signum(chassisSpeeds.vxMetersPerSecond) * -1 * Math.min(Math.abs(chassisSpeeds.vxMetersPerSecond / 3), 0.8), 
+                Math.signum(chassisSpeeds.omegaRadiansPerSecond) * Math.min(Math.abs(chassisSpeeds.omegaRadiansPerSecond / 3), 0.8));
+  }
+
+  public void setLeftInversion(Boolean inverted){
+    leftFrontMotor.setInverted(inverted);
+    leftBackMotor.setInverted(inverted);
+  }
+  public void setRightInversion(Boolean inverted){
+    rightFrontMotor.setInverted(inverted);
+    rightBackMotor.setInverted(inverted);
   }
 
   public Command getAutonomousCommand(String pathName, boolean setOdomToStart) {
@@ -171,7 +183,10 @@ public class DriveSubsystem extends SubsystemBase {
     try {
       System.out.println("Trying");
       PathPlannerAuto path = new PathPlannerAuto("NEO Test 1");
+      gyro.reset();
+      System.out.println("STARTING POSE " + PathPlannerAuto.getStaringPoseFromAutoFile("NEO Test 1").toString());
       resetPose(PathPlannerAuto.getStaringPoseFromAutoFile("NEO Test 1"));
+      System.out.println("CURRENT POSE : " + odometer.getPoseMeters().getTranslation().toString());
 
       // Create a path following command using AutoBuilder. This will also trigger
       // event markers.
@@ -185,10 +200,18 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("# of Rotations", getPosition(lfEncoder));
+    SmartDashboard.putNumber("LF position", getPosition(lfEncoder));
+    SmartDashboard.putNumber("RF position", getPosition(rfEncoder));
+    SmartDashboard.putNumber("LB position", getPosition(lbEncoder));
+    SmartDashboard.putNumber("RB position", getPosition(rbEncoder));
+    SmartDashboard.putString("Pose2d", odometer.getPoseMeters().getTranslation().toString());
+    SmartDashboard.putNumber("L Vel", lfEncoder.getVelocity());
+    SmartDashboard.putNumber("R Vel", rfEncoder.getVelocity());
+
     var gyroAngle = gyro.getRotation2d();                                       
     // This method will be called once per scheduler run
-    Pose2d pose = odometer.update(gyroAngle, lfEncoder.getPosition(), rfEncoder.getPosition()); //Updating pose
+    Pose2d pose = odometer.update(gyroAngle, (lfEncoder.getPosition() + lbEncoder.getPosition()) / 2, 
+                                             (rfEncoder.getPosition() + rbEncoder.getPosition()) / -2); //Updating pose
   }
 
   @Override
