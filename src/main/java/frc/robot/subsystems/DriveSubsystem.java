@@ -205,8 +205,8 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("LB position", getPosition(lbEncoder));
     SmartDashboard.putNumber("RB position", getPosition(rbEncoder));
     SmartDashboard.putString("Pose2d", odometer.getPoseMeters().getTranslation().toString());
-    SmartDashboard.putNumber("L Vel", lfEncoder.getVelocity());
-    SmartDashboard.putNumber("R Vel", rfEncoder.getVelocity());
+    SmartDashboard.putNumber("L Vel", lfEncoder.getVelocity() / (6 * Math.PI) / 30); // RPS
+    SmartDashboard.putNumber("R Vel", rfEncoder.getVelocity() / 6 / Math.PI / 30); //RPS
 
     var gyroAngle = gyro.getRotation2d();                                       
     // This method will be called once per scheduler run

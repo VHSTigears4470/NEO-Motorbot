@@ -28,7 +28,7 @@ public class RobotContainer {
   public RobotContainer() {
     this.xbox = new CommandXboxController(OperatorConstants.kDriverControllerPort);
     this.driveSubsystem = new DriveSubsystem(xbox);
-    driveSubsystem.setLeftInversion(true);
+    driveSubsystem.setLeftInversion(false);
     driveSubsystem.setRightInversion(true);
     driveSubsystem.resetEncoders();
     autoChooser = AutoBuilder.buildAutoChooser();
