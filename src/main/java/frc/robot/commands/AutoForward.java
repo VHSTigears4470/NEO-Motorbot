@@ -1,21 +1,18 @@
 package frc.robot.commands;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /** Default drive command for differential drive. */
-public class ArcadeDrive extends Command {
+public class AutoForward extends Command {
     private final DriveSubsystem sub;
-    private final CommandXboxController xbox;
 
     /**
      * Creates a new ArcadeDrive command.
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ArcadeDrive(DriveSubsystem sub, CommandXboxController xbox) {
+    public AutoForward(DriveSubsystem sub) {
         this.sub = sub;
-        this.xbox = xbox;
         addRequirements(sub);
     }
 
@@ -27,7 +24,7 @@ public class ArcadeDrive extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        sub.arcadeDrive(-1 * xbox.getLeftY(), -1 * xbox.getLeftX());
+        sub.arcadeDrive(0, 1);
     }
 
     // Called once the command ends or is interrupted.
