@@ -190,7 +190,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Encoder Avg", encoderAverage());
     SmartDashboard.putString("Pose2d", odometer.getPoseMeters().getTranslation().toString());
     SmartDashboard.putNumber("L Vel", lfEncoder.getVelocity());
-    SmartDashboard.putNumber("R Vel", rfEncoder.getVelocity());    
+    SmartDashboard.putNumber("R Vel", rfEncoder.getVelocity());
   }
 
   @Override
