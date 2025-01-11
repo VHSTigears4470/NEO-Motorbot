@@ -27,14 +27,11 @@ public class RobotContainer {
 
   public RobotContainer() {
     this.xbox = new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    this.driveSubsystem = new DriveSubsystem(xbox);
-    driveSubsystem.setLeftInversion(true);
-    driveSubsystem.setRightInversion(true);
-    driveSubsystem.resetEncoders();
+    this.driveSubsystem = new DriveSubsystem();
+    driveSubsystem.setInversions(true, false);
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    
     autoChooser.addOption("NEO Test 1", new PathPlannerAuto("NEO Test 1"));
     // Configure the trigger bindings
     //configureBindings();
@@ -89,7 +86,7 @@ public class RobotContainer {
    
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return driveSubsystem.getAutonomousCommand("NEO Test 1", true);
+    return driveSubsystem.getAutonomousCommand("Horizontal", true);
   }
 
   public void reset(){

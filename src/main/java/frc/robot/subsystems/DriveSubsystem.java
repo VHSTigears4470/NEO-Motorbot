@@ -4,12 +4,9 @@
 
 package frc.robot.subsystems;
 
-import java.nio.file.Path;
-
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -27,7 +24,6 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -47,19 +43,23 @@ public class DriveSubsystem extends SubsystemBase {
   DifferentialDrive differentialDrive;
   DifferentialDriveWheelPositions wheelPositions;
 
-  CommandXboxController xboxController;
-
-  public DriveSubsystem(CommandXboxController xboxController) {
+  public DriveSubsystem() {
 
     leftFrontMotor = new CANSparkMax(DriveConstants.leftFrontChannel, MotorType.kBrushless);
     leftBackMotor = new CANSparkMax(DriveConstants.leftBackChannel, MotorType.kBrushless);
     rightFrontMotor = new CANSparkMax(DriveConstants.rightFrontChannel, MotorType.kBrushless);
     rightBackMotor = new CANSparkMax(DriveConstants.rightBackChannel, MotorType.kBrushless);
+    setInversions(true, false); // ORBB: false | AR: true
 
     lfEncoder = leftFrontMotor.getEncoder();
+    lfEncoder.setPositionConversionFactor(DriveConstants.wheelRate); 
     lbEncoder = leftBackMotor.getEncoder();
+    lbEncoder.setPositionConversionFactor(DriveConstants.wheelRate); 
     rfEncoder = rightFrontMotor.getEncoder();
+    rfEncoder.setPositionConversionFactor(DriveConstants.wheelRate);
     rbEncoder = rightBackMotor.getEncoder();
+    rbEncoder.setPositionConversionFactor(DriveConstants.wheelRate);
+    resetEncoders();
 
     wheelPositions = new DifferentialDriveWheelPositions(lfEncoder.getPosition(), rfEncoder.getPosition());
 
@@ -67,24 +67,9 @@ public class DriveSubsystem extends SubsystemBase {
     odometer = new DifferentialDriveOdometry(gyro.getRotation2d(), lfEncoder.getPosition(), rfEncoder.getPosition(), 
                                              new Pose2d(0, 0, new Rotation2d())); //MODIFY (5, 13.5)
     
-    lfEncoder.setPositionConversionFactor(DriveConstants.wheelRate); 
-    lbEncoder.setPositionConversionFactor(DriveConstants.wheelRate); 
-    rfEncoder.setPositionConversionFactor(DriveConstants.wheelRate);
-    rbEncoder.setPositionConversionFactor(DriveConstants.wheelRate);
-
-    leftBackMotor.follow(leftFrontMotor);
-    leftFrontMotor.setInverted(false);
-    rightBackMotor.follow(rightFrontMotor);
-    rightFrontMotor.setInverted(true); // ORBB: false | AR: true
-
     differentialDrive = new DifferentialDrive(leftFrontMotor, rightFrontMotor);
 
-    this.xboxController = xboxController;
-
-
-    ReplanningConfig config = new ReplanningConfig(true, true, 0.1, 0.1); //TODO: UPDATE
-
-    
+    ReplanningConfig config = new ReplanningConfig(true, true, 0.1, 0.1); //TODO: UPDATE  
 
     AutoBuilder.configureRamsete(
             this::getPose, 
@@ -132,10 +117,6 @@ public class DriveSubsystem extends SubsystemBase {
     return lfEncoder;
   }
 
-  public double getPosition(RelativeEncoder encoder){
-    return encoder.getPosition();
-  }
-
   public RelativeEncoder getLBncoder() {
     return lbEncoder;
   }
@@ -165,27 +146,25 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    arcadeDrive(Math.signum(chassisSpeeds.vxMetersPerSecond) * -1 * Math.min(Math.abs(chassisSpeeds.vxMetersPerSecond / 3), 0.8), 
+    arcadeDrive(Math.signum(chassisSpeeds.vxMetersPerSecond) * Math.min(Math.abs(chassisSpeeds.vxMetersPerSecond / 3), 0.8), 
                 Math.signum(chassisSpeeds.omegaRadiansPerSecond) * Math.min(Math.abs(chassisSpeeds.omegaRadiansPerSecond / 3), 0.8));
   }
 
-  public void setLeftInversion(Boolean inverted){
-    leftFrontMotor.setInverted(inverted);
-    leftBackMotor.setInverted(inverted);
-  }
-  public void setRightInversion(Boolean inverted){
-    rightFrontMotor.setInverted(inverted);
-    rightBackMotor.setInverted(inverted);
+  public void setInversions(Boolean invertedR, Boolean invertedL){
+    leftBackMotor.follow(leftFrontMotor);
+    leftFrontMotor.setInverted(invertedL);
+    rightBackMotor.follow(leftFrontMotor);
+    rightFrontMotor.setInverted(invertedR);
   }
 
   public Command getAutonomousCommand(String pathName, boolean setOdomToStart) {
     // Load the path you want to follow using its name in the GUI
     try {
       System.out.println("Trying");
-      PathPlannerAuto path = new PathPlannerAuto("NEO Test 1");
+      PathPlannerAuto path = new PathPlannerAuto(pathName);
       gyro.reset();
-      System.out.println("STARTING POSE " + PathPlannerAuto.getStaringPoseFromAutoFile("NEO Test 1").toString());
-      resetPose(PathPlannerAuto.getStaringPoseFromAutoFile("NEO Test 1"));
+      System.out.println("STARTING POSE " + PathPlannerAuto.getStaringPoseFromAutoFile(pathName).toString());
+      resetPose(PathPlannerAuto.getStaringPoseFromAutoFile(pathName));
       System.out.println("CURRENT POSE : " + odometer.getPoseMeters().getTranslation().toString());
 
       // Create a path following command using AutoBuilder. This will also trigger
@@ -200,18 +179,18 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("LF position", getPosition(lfEncoder));
-    SmartDashboard.putNumber("RF position", getPosition(rfEncoder));
-    SmartDashboard.putNumber("LB position", getPosition(lbEncoder));
-    SmartDashboard.putNumber("RB position", getPosition(rbEncoder));
+    Rotation2d gyroAngle = gyro.getRotation2d();  
+    odometer.update(gyroAngle, (lfEncoder.getPosition() + lbEncoder.getPosition()) / 2, 
+                   (rfEncoder.getPosition() + rbEncoder.getPosition()) / -2); //Updating pose
+
+    SmartDashboard.putNumber("LF encoder", lfEncoder.getPosition());
+    SmartDashboard.putNumber("RF encoder", rfEncoder.getPosition());
+    SmartDashboard.putNumber("LB encoder", lbEncoder.getPosition());
+    SmartDashboard.putNumber("RB encoder", rbEncoder.getPosition());
+    SmartDashboard.putNumber("Encoder Avg", encoderAverage());
     SmartDashboard.putString("Pose2d", odometer.getPoseMeters().getTranslation().toString());
     SmartDashboard.putNumber("L Vel", lfEncoder.getVelocity());
-    SmartDashboard.putNumber("R Vel", rfEncoder.getVelocity());
-
-    var gyroAngle = gyro.getRotation2d();                                       
-    // This method will be called once per scheduler run
-    Pose2d pose = odometer.update(gyroAngle, (lfEncoder.getPosition() + lbEncoder.getPosition()) / 2, 
-                                             (rfEncoder.getPosition() + rbEncoder.getPosition()) / -2); //Updating pose
+    SmartDashboard.putNumber("R Vel", rfEncoder.getVelocity());    
   }
 
   @Override
